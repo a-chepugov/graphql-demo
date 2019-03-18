@@ -1,0 +1,32 @@
+{
+  "name": "graphql-demo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "start:watch": "nodemon index.js --watch",
+    "mock": "node mocks",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/a-chepugov/graphql-demo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/a-chepugov/graphql-demo/issues"
+  },
+  "homepage": "https://github.com/a-chepugov/graphql-demo#readme",
+  "dependencies": {
+    "config": "^1.26.1",
+    "express": "^4.15.2",
+    "express-graphql": "^0.6.12",
+    "graphql": "^14.0.2",
+    "graphql-depth-limit": "^1.1.0",
+    "isomorphic-fetch": "^2.2.1",
+    "sqlite": "^3.0.2"
+  }
+}
