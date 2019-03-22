@@ -1,11 +1,10 @@
 const {
 	GraphQLObjectType,
-	GraphQLSchema
+	GraphQLSchema,
 } = require('graphql');
 
 const query = new GraphQLObjectType({
 	name: 'Query',
-	description: 'Схема',
 	fields: () => ({
 		echo: require('./Queries/echo'),
 		city: require('./Queries/city'),
@@ -13,8 +12,25 @@ const query = new GraphQLObjectType({
 	})
 });
 
+
+
+
+const mutation = new GraphQLObjectType({
+	name: 'Mutation',
+	fields: () => ({
+		addCity: require('./Mutations/city').add,
+	})
+});
+
 const schema = new GraphQLSchema({
-	query
+	types: [
+		require('./Types/Pets/Bird').default,
+		require('./Types/Pets/Dog').default,
+		require('./Types/Pets/Dragon').default,
+		require('./Types/Pets/Fish').default,
+	],
+	query,
+	mutation
 });
 
 module.exports = {schema};

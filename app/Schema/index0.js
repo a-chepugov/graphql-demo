@@ -5,6 +5,7 @@ const {
 var schema = buildSchema(`
 type Query {
 	message: String,
+	city(id: ID): City
 	person(id: ID): Person
 },
 type Person {
@@ -17,15 +18,17 @@ type City {
 	id: ID,
 	name: String,
 	code: String
+	residents: [Person]
 }
 `);
 
-
 const root = {
 	message: () => 'Hello World!',
-	person(args, {dbs}) {
-		return dbs.persons.then((db) =>
-			db.get('SELECT * FROM persons WHERE id = ?', args.id))
+	city(args, context) {
+		return context.models.cities.get(args.id);
+	},
+	person(args, context) {
+		return context.models.persons.get(args.id);
 	}
 };
 

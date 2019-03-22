@@ -4,12 +4,11 @@ const {
 } = require('graphql');
 
 module.exports = {
-	type: require('../Types/City'),
+	type: require('../Types/City').default,
 	args: {
 		id: {type: GraphQLNonNull(GraphQLID)}
 	},
 	resolve(parent, args, context, info) {
-		return context.dbs.cities.then((db) =>
-			db.get('SELECT * FROM cities WHERE id = ?', args.id))
+		return context.models.cities.get(args.id)
 	}
 };

@@ -1,2 +1,13 @@
 const sqlite = require('sqlite');
-module.exports = (file = ':memory:') => sqlite.open(file, {Promise});
+
+let dbs = new Map();
+
+module.exports = (file = ':memory:') => {
+	if (dbs.has(file)) {
+		return dbs.get(file);
+	} else {
+		const db = sqlite.open(file, {Promise});
+		dbs.set(file, db);
+		return db;
+	}
+};

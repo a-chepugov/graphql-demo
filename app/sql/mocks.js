@@ -1,43 +1,103 @@
 const mocks = require('../../mocks');
 
-const persons = () => {
-	const db = require('./init')('./persons.sqlite');
-
-	const persons = require('./persons')(db);
-	const relations = require('./relations')(db);
-
-	// persons.init()
-	// 	.then(() => Promise.all(
-	// 		mocks.persons.map((item) => persons.create(item))));
-	//
-	// relations.drop()
-	// 	.then(() => relations.init())
-	// 	.then(() =>
-	// 		Promise.all(
-	// 			mocks.persons.map(({id, relations: relationsIds}) =>
-	// 				Promise.all(
-	// 					relationsIds.map((anotherId) => relations.create(id, anotherId)))
-	// 			))
-	// 	);
-
-	return db;
-};
-
-
 const cities = () => {
-	const db = require('./init')('./cities.sqlite');
+	const dbPromise = require('./init')('./dbs/locations.sqlite');
 
-	const cities = require('./cities')(db);
-	cities.init()
-		.then((() =>
-			Promise.all(
-				mocks.cities.map((item) => cities.create(item))
-			)));
+	const cities = require('./locations.cities')(dbPromise);
 
-	return db;
+	cities.drop()
+		.then(() => cities.init())
+		.then(() => mocks.cities.map((item) => cities.create(item)))
+		.then((response) => Promise.all(response))
+		.catch((error) => {
+			console.log('DEBUG:mocks.js():13 =>');
+			console.error(error);
+		});
+
+	return cities;
 };
+
+const persons = () => {
+	const dbPromise = require('./init')('./dbs/persons.sqlite');
+
+	const persons = require('./persons.persons')(dbPromise);
+
+	persons.drop()
+		.then(() => persons.init())
+		.then(() => mocks.persons.map((item) => persons.create(item)))
+		.then((response) => Promise.all(response))
+		.catch((error) => {
+			console.log('DEBUG:mocks.js():27 =>');
+			console.error(error);
+		});
+
+	relations(dbPromise);
+
+	return persons;
+};
+
+function relations() {
+	const dbPromise = require('./init')('./dbs/persons.sqlite');
+
+	const relations = require('./persons.relations')(dbPromise);
+
+	relations.drop()
+		.then(() => relations.init())
+		.then(() => mocks.relations.map((item) => relations.create(item.id_one, item.id_two)))
+		.then((response) => Promise.all(response))
+		.catch((error) => {
+			console.log('DEBUG:mocks.js():43 =>');
+			console.error(error);
+		});
+
+
+	return relations;
+}
+
+const pets = () => {
+	const dbPromise = require('./init')('./dbs/pets.sqlite');
+
+	const pets = {
+		Bird: require('./pets.birds')(dbPromise),
+		Dog: require('./pets.dogs')(dbPromise),
+		Dragon: require('./pets.dragons')(dbPromise),
+		Fish: require('./pets.fishes')(dbPromise),
+	};
+
+	const ownership = require('./pets.ownership')(dbPromise);
+
+	Promise.resolve()
+		.then(() => Object.values(pets)
+			.map((item) =>
+				item.drop()
+					.then(() => item.init())
+			))
+		.then((response) => Promise.all(response))
+		.then(() => ownership.drop().then((response) => ownership.init()))
+		.then(() => {
+			return mocks.pets
+				.map((item) => {
+					return pets[item.__typename].create(item)
+						.then((response) => ownership.create({id: response.stmt.lastID, owner_id: item.owner_id, __typename: item.__typename}))
+				})
+		})
+		.then((response) => Promise.all(response))
+		.catch(console.error);
+
+	return pets;
+};
+
+const ownership = () => {
+	const dbPromise = require('./init')('./dbs/pets.sqlite');
+	const ownership = require('./pets.ownership')(dbPromise);
+	return ownership;
+};
+
 
 module.exports = {
 	cities: cities(),
 	persons: persons(),
+	relations: relations(),
+	pets: pets(),
+	ownership: ownership(),
 };

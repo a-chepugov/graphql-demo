@@ -4,13 +4,12 @@ const {
 } = require('graphql');
 
 module.exports = {
-	type: require('../Types/Person'),
+	type: require('../Types/Person').default,
 	args: {
 		id: {type: GraphQLNonNull(GraphQLID)},
-		date: {type: require('../Types/ISODate')}
+		date: {type: require('../Types/ISODate').default}
 	},
 	resolve(parent, args, context, info) {
-		return context.dbs.persons.then((db) =>
-			db.get('SELECT * FROM persons WHERE id = ?', args.id))
+		return context.models.persons.get(args.id);
 	}
 };

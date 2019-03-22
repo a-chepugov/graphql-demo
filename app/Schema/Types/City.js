@@ -7,7 +7,7 @@ const {
 	GraphQLString
 } = require('graphql');
 
-module.exports = new GraphQLObjectType({
+module.exports.default = new GraphQLObjectType({
 	name: 'City',
 	fields: () => ({
 		id: {type: new GraphQLNonNull(GraphQLID)},
@@ -17,10 +17,9 @@ module.exports = new GraphQLObjectType({
 			args: {
 				limit: {type: GraphQLInt, defaultValue: 5}
 			},
-			type: GraphQLList(require('./Person')),
+			type: new GraphQLList(require('./Person').default),
 			resolve(parent, args, context, info) {
-				return context.dbs.persons
-					.then((db) => db.all('SELECT * FROM persons WHERE city_id = ? LIMIT ?', parent.id, args.limit));
+				return context.models.persons.getInCity(parent.id, args.limit);
 			}
 		},
 	})

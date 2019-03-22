@@ -3,7 +3,7 @@ const {
 	Kind
 } = require('graphql');
 
-module.exports = new GraphQLScalarType({
+module.exports.default = new GraphQLScalarType({
 	name: 'ISODate',
 	serialize(value) {
 		return new Date(value);

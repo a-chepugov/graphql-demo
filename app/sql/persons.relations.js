@@ -15,5 +15,23 @@ module.exports = (dbPromise) => {
 	result.create = (idOne, idTwo) => dbPromise.then((db) =>
 		db.run('INSERT OR IGNORE INTO relations (id_one, id_two) VALUES (?, ?)', idOne, idTwo));
 
+	result.get = (id) =>
+		dbPromise.then((db) => {
+				return db.all('SELECT id_one as idOne, id_two as idTwo FROM relations WHERE id_one = ? OR id_two = ?', id, id)
+					.then((response) => {
+						const all = response.reduce((a, {idOne, idTwo}) => {
+							if (idOne !== id)
+								a.add(idOne);
+
+							if (idTwo !== id)
+								a.add(idTwo);
+
+							return a;
+						}, new Set());
+						return Array.from(all);
+					})
+			}
+		);
+
 	return result;
 };

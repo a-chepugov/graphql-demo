@@ -12,38 +12,47 @@ const Person = new GraphQLObjectType({
 	fields: () => ({
 		id: {type: new GraphQLNonNull(GraphQLID)},
 		name: {type: GraphQLString},
+		sex: {type: require('./Sex').default},
 		birthdate: {type: GraphQLFloat, deprecationReason: 'Пример пометки поля устаревшим'},
-		birthdateISO: {type: require('./ISODate'),
+		birthdateISO: {
+			type: require('./ISODate').default,
 			resolve(parent, args, context, info) {
-			return parent.birthdate;
+				return parent.birthdate;
 			}
 		},
 		phone: {type: GraphQLString},
 		text: {type: GraphQLString},
 		friends: {
-			type: GraphQLList(Person),
+			type: new GraphQLList(Person),
 			resolve(parent, args, context, info) {
-				return context.dbs.persons
-					.then((db) => db.all('SELECT id_two as id FROM relations WHERE id_one = ?', parent.id))
-					.then((response) => response.map(({id}) => id))
-					.then((ids) =>
-						Promise.all(
-							ids.map((id) =>
-								context.dbs.persons.then((db) =>
-									db.get('SELECT * FROM persons WHERE id = ?', id))))
-					)
+				return context.models.relations.get(parent.id)
+					.then((ids) => ids.map((id) => context.models.persons.get(id)))
+					.then((response) => Promise.all(response))
+				// .then((ids) => context.models.persons.getMany(ids))
 			}
 		},
 		city: {
-			type: require('./City'),
+			type: require('./City').default,
 			resolve(parent, args, context, info) {
-				return context.dbs.cities.then((db) => db.get('SELECT * FROM cities WHERE id = ?', parent.city_id))
+				return context.models.cities.get(parent.city_id);
 			}
+		},
+		pets: {
+			// type: new GraphQLList(require('./Pets/Union').default),
+			type: new GraphQLList(require('./Pets/Interface').default),
+			resolve(parent, args, context, info) {
+				return context.models.ownership.get(parent.id)
+					.then((response) =>
+						response.map((item) => {
+							console.log('DEBUG:Person.js():47 =>', item);
+
+							return context.models.pets[item.__typename].get(item.id)
+								.then((response) => Object.assign(response, item))}
+						)
+					)
+			},
 		}
 	})
 });
 
-module.exports = Person;
-
-
-// context.dbs.persons.then((db) => db.all(`SELECT * FROM persons WHERE id in (${ids.join(',')})`))
+module.exports.default = Person;
