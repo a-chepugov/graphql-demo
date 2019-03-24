@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+</head>
+<body>
+<h1>DEBUG - index.html(7) - </h1>
+<script>
+fetch('/person/1')
+	.then((response) => {
+		console.log('DEBUG:index():11 =====>');
+		console.dir(response, {colors: true, depth: null});
+		console.log('DEBUG:index():13 ===>');
+		return response;
+	})
+	.catch((error) => {
+		console.error('DEBUG:index():17 =====>');
+		console.error(error);
+		console.error('DEBUG:index():19 ===>');
+		throw error;
+	})
+
+
+</script>
+</body>
+</html>

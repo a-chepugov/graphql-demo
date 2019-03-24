@@ -1,28 +1,29 @@
 'use strict';
-const http = require('http');
-const express = require('express');
-const graphqlHTTP = require('express-graphql');
 const config = require('config');
+const express = require('express');
+const http = require('http');
+
+const graphqlHTTP = require('express-graphql');
 const depthLimit = require('graphql-depth-limit');
 
-const models = require('./sql/mocks');
+const app = express();
+
+require('./routes')(app);
 
 // const params = require('./Schema/index0');
 const params = require('./Schema/index');
-
-const app = express();
 
 app.use('/', graphqlHTTP({
 	schema: params.schema,
 	rootValue: params.root,
 	graphiql: true,
-	context: {models},
+	context: {managers: require('./sql/mocks')},
 	validationRules: [depthLimit(5)]
 }));
 
 const port = config.port;
-const server = http.createServer(app);
-
-server.listen(port, function () {
-	console.info(`GraphQL сервер запущен на http://localhost:${port}`);
-});
+http
+	.createServer(app)
+	.listen(port, function () {
+		console.info(`GraphQL сервер запущен на http://localhost:${port}`);
+	});
