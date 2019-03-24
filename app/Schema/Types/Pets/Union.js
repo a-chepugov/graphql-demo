@@ -10,7 +10,7 @@ module.exports.default = new GraphQLUnionType({
 		owner: {
 			type: require('../Person').default,
 			resolve(parent, args, context, info) {
-				return context.models.persons.get(parent.owner_id);
+				return context.managers.persons.get(parent.owner_id);
 			}
 		},
 	}),

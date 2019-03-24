@@ -19,7 +19,7 @@ module.exports.default = new GraphQLObjectType({
 			},
 			type: new GraphQLList(require('./Person').default),
 			resolve(parent, args, context, info) {
-				return context.models.persons.getInCity(parent.id, args.limit);
+				return context.managers.persons.getInCity(parent.id, args.limit);
 			}
 		},
 	})

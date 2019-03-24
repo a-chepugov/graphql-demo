@@ -16,7 +16,7 @@ module.exports.default = new GraphQLObjectType({
 		owner: {
 			type: require('../Person').default,
 			resolve(parent, args, context, info) {
-				return context.models.persons.get(parent.owner_id);
+				return context.managers.persons.get(parent.owner_id);
 			}
 		},
 	}),

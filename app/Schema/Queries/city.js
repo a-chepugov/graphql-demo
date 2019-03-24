@@ -9,6 +9,6 @@ module.exports = {
 		id: {type: GraphQLNonNull(GraphQLID)}
 	},
 	resolve(parent, args, context, info) {
-		return context.models.cities.get(args.id)
+		return context.managers.cities.get(args.id)
 	}
 };

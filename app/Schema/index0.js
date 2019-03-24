@@ -25,10 +25,10 @@ type City {
 const root = {
 	message: () => 'Hello World!',
 	city(args, context) {
-		return context.models.cities.get(args.id);
+		return context.managers.cities.get(args.id);
 	},
 	person(args, context) {
-		return context.models.persons.get(args.id);
+		return context.managers.persons.get(args.id);
 	}
 };
 

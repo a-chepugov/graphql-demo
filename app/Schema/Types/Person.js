@@ -25,28 +25,28 @@ const Person = new GraphQLObjectType({
 		friends: {
 			type: new GraphQLList(Person),
 			resolve(parent, args, context, info) {
-				return context.models.relations.get(parent.id)
-					.then((ids) => ids.map((id) => context.models.persons.get(id)))
+				return context.managers.relations.get(parent.id)
+					.then((ids) => ids.map((id) => context.managers.persons.get(id)))
 					.then((response) => Promise.all(response))
-				// .then((ids) => context.models.persons.getMany(ids))
+				// .then((ids) => context.managers.persons.getMany(ids))
 			}
 		},
 		city: {
 			type: require('./City').default,
 			resolve(parent, args, context, info) {
-				return context.models.cities.get(parent.city_id);
+				return context.managers.cities.get(parent.city_id);
 			}
 		},
 		pets: {
 			// type: new GraphQLList(require('./Pets/Union').default),
 			type: new GraphQLList(require('./Pets/Interface').default),
 			resolve(parent, args, context, info) {
-				return context.models.ownership.get(parent.id)
+				return context.managers.ownership.get(parent.id)
 					.then((response) =>
 						response.map((item) => {
 							console.log('DEBUG:Person.js():47 =>', item);
 
-							return context.models.pets[item.__typename].get(item.id)
+							return context.managers.pets[item.__typename].get(item.id)
 								.then((response) => Object.assign(response, item))}
 						)
 					)

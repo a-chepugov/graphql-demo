@@ -10,6 +10,6 @@ module.exports = {
 		date: {type: require('../Types/ISODate').default}
 	},
 	resolve(parent, args, context, info) {
-		return context.models.persons.get(args.id);
+		return context.managers.persons.get(args.id);
 	}
 };
