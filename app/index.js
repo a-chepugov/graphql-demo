@@ -8,7 +8,9 @@ const depthLimit = require('graphql-depth-limit');
 
 const app = express();
 
-require('./routes')(app);
+const managers = require('./sql/mocks');
+
+require('./routes')(app, managers);
 
 // const params = require('./Schema/index0');
 const params = require('./Schema/index');
@@ -17,7 +19,7 @@ app.use('/', graphqlHTTP({
 	schema: params.schema,
 	rootValue: params.root,
 	graphiql: true,
-	context: {managers: require('./sql/mocks')},
+	context: {managers},
 	validationRules: [depthLimit(5)]
 }));
 

@@ -20,11 +20,13 @@ module.exports = (dbPromise) => {
 				return db.all('SELECT id_one as idOne, id_two as idTwo FROM relations WHERE id_one = ? OR id_two = ?', id, id)
 					.then((response) => {
 						const all = response.reduce((a, {idOne, idTwo}) => {
-							if (idOne !== id)
+							if (idOne != id) {
 								a.add(idOne);
+							}
 
-							if (idTwo !== id)
+							if (idTwo != id) {
 								a.add(idTwo);
+							}
 
 							return a;
 						}, new Set());

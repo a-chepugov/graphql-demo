@@ -13,15 +13,24 @@ const Person = new GraphQLObjectType({
 		id: {type: new GraphQLNonNull(GraphQLID)},
 		name: {type: GraphQLString},
 		sex: {type: require('./Sex').default},
-		birthdate: {type: GraphQLFloat, deprecationReason: 'Пример пометки поля устаревшим'},
+		birthdate: {
+			type: GraphQLFloat,
+			deprecationReason: 'Здесь надо описать причину признеания метода устаревшим'
+		},
 		birthdateISO: {
 			type: require('./ISODate').default,
 			resolve(parent, args, context, info) {
 				return parent.birthdate;
 			}
 		},
-		phone: {type: GraphQLString},
-		text: {type: GraphQLString},
+		phones: {
+			type: GraphQLList(GraphQLString),
+			description: 'Номер телефона',
+			resolve(parent, args, context, info) {
+				return context.managers.phones.getByOwnerId(parent.id)
+					.then((response) => response.map(({value}) => value))
+			}
+		},
 		friends: {
 			type: new GraphQLList(Person),
 			resolve(parent, args, context, info) {
@@ -44,10 +53,9 @@ const Person = new GraphQLObjectType({
 				return context.managers.ownership.get(parent.id)
 					.then((response) =>
 						response.map((item) => {
-							console.log('DEBUG:Person.js():47 =>', item);
-
-							return context.managers.pets[item.__typename].get(item.id)
-								.then((response) => Object.assign(response, item))}
+								return context.managers.pets[item.__typename].get(item.id)
+									.then((response) => Object.assign(response, item))
+							}
 						)
 					)
 			},

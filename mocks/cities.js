@@ -4,7 +4,7 @@ const cities = [
 	{name: 'London', code: '+4420'},
 	{name: 'Madrid', code: '+34'},
 	{name: 'Moscow', code: '+7495'},
-	{name: 'USA', code: '+1202'}
+	{name: 'Washington', code: '+1202'}
 ].map((item, index) => {
 	item.id = index + 1;
 	return item

@@ -4,7 +4,6 @@ CREATE TABLE IF NOT EXISTS persons (
 	name TEXT NOT NULL,
 	sex INTEGER NOT NULL,
 	birthdate INTEGER NOT NULL,
-	phone TEXT NOT NULL,
 	city_id INTEGER NOT NULL
 );
 `;
@@ -19,8 +18,8 @@ module.exports = (dbPromise) => {
 	result.create = (data) =>
 		dbPromise.then((db) =>
 			db.run(
-				'INSERT OR IGNORE INTO persons (id, name, sex, birthdate, phone, city_id) VALUES (?, ?, ?, ?, ?, ?)',
-				data.id, data.name, data.sex, data.birthdate, data.phone, data.cityId));
+				'INSERT OR IGNORE INTO persons (id, name, sex, birthdate, city_id) VALUES (?, ?, ?, ?, ?)',
+				data.id, data.name, data.sex, data.birthdate, data.cityId));
 
 
 	result.get = (id) =>
@@ -35,7 +34,7 @@ module.exports = (dbPromise) => {
 			}
 		);
 
-	result.getInCity = (id, limit = 10) =>
+	result.getInCity = (id, limit = 5) =>
 		dbPromise.then((db) => {
 				return db.all('SELECT * FROM persons WHERE city_id = ? LIMIT ?', id, limit)
 			}

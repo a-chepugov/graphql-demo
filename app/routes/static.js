@@ -1,1 +1,1 @@
-module.exports = (app) => app.use(require('express').static(require('config').static));
+module.exports = (app, path) => app.use(require('express').static(path));

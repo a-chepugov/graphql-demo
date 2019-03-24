@@ -21,10 +21,22 @@ const persons = () => {
 	const dbPromise = require('./init')('./dbs/persons.sqlite');
 
 	const persons = require('./persons.persons')(dbPromise);
+	const phones = require('./persons.phones')(dbPromise);
 
 	persons.drop()
 		.then(() => persons.init())
-		.then(() => mocks.persons.map((item) => persons.create(item)))
+		.then(() => phones.drop())
+		.then(() => phones.init())
+		.then(() => mocks.persons.map(
+			(item) => {
+				Promise.all([
+					persons.create(item),
+					item.phones.map((phone) => {
+						phones.create({owner_id: item.id, value: phone})
+					})
+				])
+			})
+		)
 		.then((response) => Promise.all(response))
 		.catch((error) => {
 			console.log('DEBUG:mocks.js():27 =>');
@@ -93,11 +105,17 @@ const ownership = () => {
 	return ownership;
 };
 
+const phones = () => {
+	const dbPromise = require('./init')('./dbs/persons.sqlite');
+	const phones = require('./persons.phones')(dbPromise);
+	return phones;
+};
 
 module.exports = {
 	cities: cities(),
 	persons: persons(),
 	relations: relations(),
+	phones: phones(),
 	pets: pets(),
 	ownership: ownership(),
 };
