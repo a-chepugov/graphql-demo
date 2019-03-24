@@ -14,7 +14,8 @@
 <main id="app"></main>
 
 <script>
-	// ------------------------------------ //
+
+	// ------------------------------------------------------------------------ //
 
 	const getPersonData = (id) => fetch(`/persons/${id}`)
 		.then(response => response.json());
@@ -71,6 +72,8 @@
 			)
 			.then(([person = {}, city, residents] = []) => Object.assign(person, {city: Object.assign(city, {residents})}))
 	}
+
+	// ------------------------------------------------------------------------ //
 
 	getPersonProfile(1)
 		.then((response) => render(response));
