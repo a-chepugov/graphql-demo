@@ -4,25 +4,32 @@ const {
 
 var schema = buildSchema(`
 type Query {
-	message: String,
+	message: String
 	city(id: ID): City
 	person(id: ID): Person
 },
 type Person {
-	id: ID,
-	name: String,
-	phone: String,
+	id: ID
+	name: String
+	city: [City]
 	birthdate: Float
+	phones: [String]
+	friends: [Person]
+	pets: [Pet]
 }
 type City {
-	id: ID,
-	name: String,
+	id: ID
+	name: String
 	code: String
 	residents: [Person]
 }
+type Pet {
+	id: ID
+	name: String
+}
 `);
 
-const root = {
+const rootValue = {
 	message: () => 'Hello World!',
 	city(args, context) {
 		return context.managers.cities.get(args.id);
@@ -32,4 +39,4 @@ const root = {
 	}
 };
 
-module.exports = {schema, root};
+module.exports = {schema, rootValue};

@@ -17,7 +17,7 @@ const params = require('./Schema/index');
 
 app.use('/', graphqlHTTP({
 	schema: params.schema,
-	rootValue: params.root,
+	rootValue: params.rootValue,
 	graphiql: true,
 	context: {managers},
 	validationRules: [depthLimit(5)]
