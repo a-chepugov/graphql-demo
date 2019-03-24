@@ -1,0 +1,20 @@
+{
+  "name": "graphql-demo",
+  "description": "",
+  "main": "index.js",
+  "authors": [
+    "a.chepugov <oleksii.chepugov@ria.com>"
+  ],
+  "license": "ISC",
+  "homepage": "https://github.com/a-chepugov/graphql-demo",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "^3.3.1"
+  }
+}
