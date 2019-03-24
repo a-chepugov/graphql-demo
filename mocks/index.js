@@ -3,7 +3,7 @@ let cities = require('./cities');
 let pets = require('./pets');
 
 const personsList = Array.from(new Array(100)).map((item, index, array) => {
-	const person = persons.create();
+	const person = persons.create(index);
 	const city = cities.getOne();
 
 	const number = (Array.from(new Array(12), () => Math.floor(Math.random() * 10))).join('');

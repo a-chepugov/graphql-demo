@@ -104,8 +104,7 @@ const names1 = [
 
 const randomOne = require('./_randomOne');
 
-module.exports.create = () => {
-	const id = Math.ceil(Math.random() * Number.MAX_SAFE_INTEGER);
+module.exports.create = (id) => {
 	const sex = Boolean(Math.floor(Math.random() * 2));
 
 	const namesSource = sex ? names1 : names0;
