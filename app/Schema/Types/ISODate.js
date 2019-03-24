@@ -14,7 +14,6 @@ module.exports.default = new GraphQLScalarType({
 				return new Date(ast.value);
 			}
 			case Kind.INT: {
-				console.log('DEBUG:ISODate.js(parseLiteral):27 =>', typeof ast.value);
 				return new Date(Number(ast.value));
 			}
 			default:
@@ -22,6 +21,6 @@ module.exports.default = new GraphQLScalarType({
 		}
 	},
 	parseValue(value) {
-		return value;
+		return new Date(Number(value));
 	},
 });

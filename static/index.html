@@ -5,11 +5,16 @@
 	<script src="/jquery/dist/jquery.js"></script>
 </head>
 <body>
+
+<form id="drawPerson">
+	<input name="id" type="number" value="1"/>
+	<input type="submit"/>
+</form>
+
 <main id="app"></main>
 
-<script defer>
+<script>
 	// ------------------------------------ //
-
 	const getPersonData = (id) => fetch(`/persons/${id}`)
 		.then(response => response.json());
 
@@ -35,46 +40,58 @@
 		.then(response => response.json())
 		.then((response) => Array.isArray(response) ? response : []);
 
-	const id = 3;
 
-	Promise.all([
-			getPersonData(id).catch(console.error),
-			getPersonPhones(id).catch(console.error),
-			getPersonPetsList(id)
-				.then((pets) => pets.map(({id, __typename}) => getPetData(__typename, id).then((response) => Object.assign(response, {__typename})).catch(console.error)))
-				.then((response) => Promise.all(response)),
-			getPersonFriendsIds(id)
-				.then((ids) => ids.map((id) => getPersonData(id)
-					.then((person) => getPersonPhones(person.id).catch(console.error)
-						.then((phones) => Object.assign(person, {phones}))).catch(console.error)))
-				.then((response) => Promise.all(response))
-		])
-		.then((response) => {
-			const [person = {}, phones, pets, friends] = response;
-
-			return Promise.all([
-				Object.assign(person, {phones, pets, friends}),
-				getCityData(person.city_id).catch(console.error),
-				getCityResidents(person.city_id)
-					.then((response) => {
-						return response
-							.map((person) => getPersonPhones(person.id).catch(console.error)
-								.then((phones) => Object.assign(person, {phones})).catch(console.error))
-					})
+	function getPersonProfile(id) {
+		return Promise.all([
+				getPersonData(id).catch(console.error),
+				getPersonPhones(id).catch(console.error),
+				getPersonPetsList(id)
+					.then((pets) => pets
+						.map(({id, __typename}) =>
+							getPetData(__typename, id)
+								.then((response) => Object.assign(response, {__typename})).catch(console.error)))
+					.then((response) => Promise.all(response)),
+				getPersonFriendsIds(id)
+					.then((ids) => ids
+						.map((id) => getPersonData(id)
+							.then((person) => getPersonPhones(person.id).catch(console.error)
+								.then((phones) => Object.assign(person, {phones}))).catch(console.error)))
 					.then((response) => Promise.all(response))
-					.catch(console.error)
 			])
-		})
-		.then((response) => {
-			const [person = {}, city, residents] = response;
-			return Object.assign(person, {city: Object.assign(city, {residents})});
-		})
+			.then(([person = {}, phones, pets, friends] = []) =>
+				Promise.all([
+					Object.assign(person, {phones, pets, friends}),
+					getCityData(person.city_id).catch(console.error),
+					getCityResidents(person.city_id)
+						.then((response) => {
+							return response
+								.map((person) => getPersonPhones(person.id).catch(console.error)
+									.then((phones) => Object.assign(person, {phones})).catch(console.error))
+						})
+						.then((response) => Promise.all(response))
+						.catch(console.error)
+				])
+			)
+			.then((response) => {
+				const [person = {}, city, residents] = response;
+				return Object.assign(person, {city: Object.assign(city, {residents})});
+			})
+	}
+
+	getPersonProfile(1)
 		.then((response) => render(response));
+
+	$('#drawPerson').on('submit', (event) => {
+		event.preventDefault();
+		return getPersonProfile(event.target[0].value)
+			.then((response) => render(response));
+	});
 
 	// ------------------------------------ //
 
 	function render(person) {
 		const root = $('#app');
+		root.empty();
 
 		const header = $('<h1/>', {text: person.name});
 
@@ -85,16 +102,14 @@
 			// align: 'center'
 		});
 
-		const sex = $('<span/>', {text: 'Sex: ' + (person.sex ? 'male' : 'female')}).css({margin: '1em'});
-
 		const birthdate = $('<span/>', {text: 'Birth Date: ' + new Date(person.birthdate).toLocaleDateString()}).css({margin: '1em'});
 
 		const city = $('<span/>', {text: 'Location: ' + person.city.name}).css({margin: '1em'});
 
-		block.append(sex);
 		block.append(birthdate);
 		block.append('<br />');
 		block.append(city);
+		block.append('<br />');
 
 		root.append(block);
 
@@ -103,20 +118,21 @@
 		const petsList = person.pets.map((pet) => {
 			const row = $('<tr/>');
 
-			const name = $('<td/>', {text: pet.name}).css('padding', 10);
-
-			const type = $('<td/>', {text: pet.__typename}).css('padding', 10);
+			const name = $('<td/>', {text: pet.name}).css('padding', 3);
+			const type = $('<td/>', {text: pet.__typename}).css('padding', 3);
+			const sex = $('<td/>', {text: pet.sex ? 'male' : 'female'}).css('padding', 3);
 
 			const featuresList = ['family', 'training', 'superpower', 'ecotype'];
 
 			const features = featuresList.map((feature) =>
 				pet[feature] ?
-					$('<td/>', {text: pet[feature]}).css('padding', 10) :
+					$('<td/>', {text: pet[feature]}).css('padding', 3) :
 					undefined
 			).filter(i => i);
 
 			row.append(name);
 			row.append(type);
+			row.append(sex);
 			row.append(features);
 
 			return row;

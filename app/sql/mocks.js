@@ -9,10 +9,7 @@ const cities = () => {
 		.then(() => cities.init())
 		.then(() => mocks.cities.map((item) => cities.create(item)))
 		.then((response) => Promise.all(response))
-		.catch((error) => {
-			console.log('DEBUG:mocks.js():13 =>');
-			console.error(error);
-		});
+		.catch(console.error);
 
 	return cities;
 };
@@ -38,12 +35,9 @@ const persons = () => {
 			})
 		)
 		.then((response) => Promise.all(response))
-		.catch((error) => {
-			console.log('DEBUG:mocks.js():27 =>');
-			console.error(error);
-		});
+		.catch(console.error);
 
-	relations(dbPromise);
+	relations();
 
 	return persons;
 };
@@ -57,11 +51,7 @@ function relations() {
 		.then(() => relations.init())
 		.then(() => mocks.relations.map((item) => relations.create(item.id_one, item.id_two)))
 		.then((response) => Promise.all(response))
-		.catch((error) => {
-			console.log('DEBUG:mocks.js():43 =>');
-			console.error(error);
-		});
-
+		.catch(console.error);
 
 	return relations;
 }

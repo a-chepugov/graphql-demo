@@ -2,6 +2,7 @@ const schema = `
 CREATE TABLE IF NOT EXISTS dragons (
 	id INTEGER PRIMARY KEY,
 	name TEXT NOT NULL,
+	sex INTEGER NOT NULL,
 	superpower TEXT NOT NULL
 );
 `;
@@ -16,8 +17,8 @@ module.exports = (dbPromise) => {
 	result.create = (data) =>
 		dbPromise.then((db) =>
 			db.run(
-				'INSERT OR IGNORE INTO dragons (name, superpower) VALUES (?, ?)',
-				data.name, data.superpower));
+				'INSERT OR IGNORE INTO dragons (id, name, sex, superpower) VALUES (?, ?, ?, ?)',
+				data.id, data.name, data.sex, data.superpower));
 
 	result.get = (id) =>
 		dbPromise.then((db) => {

@@ -2,7 +2,7 @@ const types = [
 	{
 		__typename: 'Bird', colors: ['purple', 'violet', 'green', 'blue', 'red', 'yellow'],
 		params: {
-			family: ['Ciconiiformes', 'Falconiformes', 'Hagaroobraznye', 'Pelicans', 'Flamingos', 'Penguins']
+			family: ['Ciconiiformes', 'Falconiformes', 'Pelicans', 'Flamingos', 'Penguins']
 		}
 	},
 	{
