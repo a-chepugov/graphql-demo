@@ -15,6 +15,7 @@
 
 <script>
 	// ------------------------------------ //
+
 	const getPersonData = (id) => fetch(`/persons/${id}`)
 		.then(response => response.json());
 
@@ -40,22 +41,18 @@
 		.then(response => response.json())
 		.then((response) => Array.isArray(response) ? response : []);
 
-
 	function getPersonProfile(id) {
 		return Promise.all([
 				getPersonData(id).catch(console.error),
 				getPersonPhones(id).catch(console.error),
 				getPersonPetsList(id)
-					.then((pets) => pets
-						.map(({id, __typename}) =>
-							getPetData(__typename, id)
-								.then((response) => Object.assign(response, {__typename})).catch(console.error)))
+					.then((pets) => pets.map(({id, __typename}) => getPetData(__typename, id)
+						.then((response) => Object.assign(response, {__typename})).catch(console.error)))
 					.then((response) => Promise.all(response)),
 				getPersonFriendsIds(id)
-					.then((ids) => ids
-						.map((id) => getPersonData(id)
-							.then((person) => getPersonPhones(person.id).catch(console.error)
-								.then((phones) => Object.assign(person, {phones}))).catch(console.error)))
+					.then((ids) => ids.map((id) => getPersonData(id)
+						.then((person) => getPersonPhones(person.id).catch(console.error)
+							.then((phones) => Object.assign(person, {phones}))).catch(console.error)))
 					.then((response) => Promise.all(response))
 			])
 			.then(([person = {}, phones, pets, friends] = []) =>
@@ -72,10 +69,7 @@
 						.catch(console.error)
 				])
 			)
-			.then((response) => {
-				const [person = {}, city, residents] = response;
-				return Object.assign(person, {city: Object.assign(city, {residents})});
-			})
+			.then(([person = {}, city, residents] = []) => Object.assign(person, {city: Object.assign(city, {residents})}))
 	}
 
 	getPersonProfile(1)
