@@ -45,7 +45,7 @@ query ($id: ID!) {
 fragment baseData on Person { name birthdate phones }
 `;
 
-	const getPersonProfile = (id) => fetch('/',
+	const getPersonProfile = (id) => fetch('/graphql',
 		{
 			method: 'POST',
 			headers: {'Content-type': 'application/json'},

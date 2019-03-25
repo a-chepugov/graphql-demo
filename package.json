@@ -21,12 +21,16 @@
   },
   "homepage": "https://github.com/a-chepugov/graphql-demo#readme",
   "dependencies": {
-    "config": "^1.26.1",
-    "express": "^4.15.2",
+    "body-parser": "^1.17.2",
+    "config": "^3.0.1",
+    "express": "^4.15.3",
     "express-graphql": "^0.6.12",
-    "graphql": "^14.0.2",
+    "graphql": "^0.10.3",
     "graphql-depth-limit": "^1.1.0",
+    "graphql-server-express": "^1.0.0",
+    "graphql-subscriptions": "^0.4.4",
     "isomorphic-fetch": "^2.2.1",
-    "sqlite": "^3.0.2"
+    "sqlite": "^3.0.1",
+    "subscriptions-transport-ws": "^0.8.0"
   }
 }

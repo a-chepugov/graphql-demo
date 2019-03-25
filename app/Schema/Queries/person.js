@@ -6,7 +6,7 @@ const {
 module.exports = {
 	type: require('../Types/Person').default,
 	args: {
-		id: {type: GraphQLNonNull(GraphQLID)},
+		id: {type: new GraphQLNonNull(GraphQLID)},
 		date: {type: require('../Types/ISODate').default}
 	},
 	resolve(parent, args, context, info) {

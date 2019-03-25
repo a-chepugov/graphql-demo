@@ -2,30 +2,59 @@
 const config = require('config');
 const express = require('express');
 const http = require('http');
+const bodyParser = require('body-parser');
 
-const graphqlHTTP = require('express-graphql');
+// const graphqlHTTP = require('express-graphql');
+const {graphqlExpress, graphiqlExpress} = require('graphql-server-express');
+const {SubscriptionServer} = require('subscriptions-transport-ws');
+const {subscribe, execute} = require('graphql');
+
 const depthLimit = require('graphql-depth-limit');
 
-const app = express();
+const port = config.port;
 
 const managers = require('./sql/mocks');
+
+const app = express();
+app.use(bodyParser.json());
 
 require('./routes')(app, managers);
 
 // const params = require('./Schema/index0');
 const params = require('./Schema/index');
 
-app.use('/', graphqlHTTP({
+// app.use('/graphql', graphqlHTTP({
+// 	schema: params.schema,
+// 	rootValue: params.rootValue,
+// 	graphiql: true,
+// 	context: {managers},
+// 	validationRules: [depthLimit(5)]
+// }));
+
+app.use('/graphql', graphqlExpress({
 	schema: params.schema,
 	rootValue: params.rootValue,
-	graphiql: true,
 	context: {managers},
 	validationRules: [depthLimit(5)]
 }));
 
-const port = config.port;
-http
-	.createServer(app)
-	.listen(port, function () {
-		console.info(`GraphQL сервер запущен на http://localhost:${port}`);
+app.use('/graphiql', graphiqlExpress({
+	endpointURL: '/graphql',
+	subscriptionsEndpoint: `ws://localhost:${port}/subscriptions`
+}));
+
+const server = http.createServer(app);
+
+server.listen(port, function () {
+	new SubscriptionServer({
+		schema: params.schema,
+		execute,
+		subscribe,
+		onConnect: () => {}
+	}, {
+		server,
+		path: '/subscriptions'
 	});
+
+	console.info(`GraphQL сервер запущен на http://localhost:${port}`);
+});

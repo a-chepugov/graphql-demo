@@ -6,7 +6,7 @@ const {
 module.exports = {
 	type: require('../Types/City').default,
 	args: {
-		id: {type: GraphQLNonNull(GraphQLID)}
+		id: {type: new GraphQLNonNull(GraphQLID)}
 	},
 	resolve(parent, args, context, info) {
 		return context.managers.cities.get(args.id)

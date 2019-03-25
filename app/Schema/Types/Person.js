@@ -24,7 +24,7 @@ const Person = new GraphQLObjectType({
 			}
 		},
 		phones: {
-			type: GraphQLList(GraphQLString),
+			type: new GraphQLList(GraphQLString),
 			description: 'Номер телефона',
 			resolve(parent, args, context, info) {
 				return context.managers.phones.getByOwnerId(parent.id)
