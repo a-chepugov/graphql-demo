@@ -11,6 +11,7 @@ module.exports.default = new GraphQLInterfaceType({
 	fields: () => ({
 		id: {type: new GraphQLNonNull(GraphQLID)},
 		name: {type: GraphQLString},
+		sex: {type: require('../Sex').default},
 		owner: {
 			type: require('../Person').default,
 			resolve(parent, args, context, info) {
