@@ -3,6 +3,13 @@
 <head>
 	<meta charset="UTF-8">
 	<script src="/jquery/dist/jquery.js"></script>
+	<style>
+		section {
+			border-bottom-width: 1px; /* Толщина линии внизу */
+			border-bottom-style: solid; /* Стиль линии внизу */
+			border-bottom-color: black; /* Цвет линии внизу */
+		}
+	</style>
 </head>
 <body>
 
@@ -53,18 +60,18 @@
 				getPersonFriendsIds(id)
 					.then((ids) => ids.map((id) => getPersonData(id)
 						.then((person) => getPersonPhones(person.id).catch(console.error)
-							.then((phones) => Object.assign(person, {phones}))).catch(console.error)))
+							.then((phones) => Object.assign(person, {phones: phones.map(({value}) => value)}))).catch(console.error)))
 					.then((response) => Promise.all(response))
 			])
 			.then(([person = {}, phones, pets, friends] = []) =>
 				Promise.all([
-					Object.assign(person, {phones, pets, friends}),
+					Object.assign(person, {phones: phones.map(({value}) => value), pets, friends}),
 					getCityData(person.city_id).catch(console.error),
 					getCityResidents(person.city_id)
 						.then((response) => {
 							return response
 								.map((person) => getPersonPhones(person.id).catch(console.error)
-									.then((phones) => Object.assign(person, {phones})).catch(console.error))
+									.then((phones) => Object.assign(person, {phones: phones.map(({value}) => value)})).catch(console.error))
 						})
 						.then((response) => Promise.all(response))
 						.catch(console.error)
@@ -87,134 +94,92 @@
 	// ------------------------------------ //
 
 	function render(person) {
+		function drawPhonesList(phones) {
+			const phonesList = $('<ul/>').css('margin', 0);
+			const phonesListItems = phones.map((phone) => $('<li/>', {text: phone, valign: 'top'}).css('list-style-type', 'none'));
+			phonesList.append(phonesListItems);
+			return phonesList;
+		}
+
+		function drawPersonRow(person) {
+			const row = $('<tr/>').css({'padding-left': '1em'});
+
+			const name = $('<td/>', {text: person.name, valign: 'top'}).appendTo(row);
+			const birthdate = $('<td/>', {text: new Date(person.birthdate).toLocaleDateString(), valign: 'top'}).appendTo(row);
+
+			const phones = $('<td/>').appendTo(row);
+			const phonesList = drawPhonesList(person.phones).appendTo(phones);
+
+			return row;
+		}
+
 		const root = $('#app');
 		root.empty();
 
-		const header = $('<h1/>', {text: person.name});
+		const personSection = $('<section/>').appendTo(root);
 
-		root.append(header);
-		root.append('<hr/>');
+		const header = $('<h1/>', {text: person.name}).appendTo(personSection);
 
-		const block = $('<div/>', {
-			// align: 'center'
-		});
+		$('<table/>', {width: '100%'})
+			.append($('<tr/>')
+				.append(
+					$('<td />', {valign: 'top'})
+						.append($('<dl/>')
+							.append($('<dt>', {text: 'Birth Date'}))
+							.append($('<dd>', {text: new Date(person.birthdate).toLocaleDateString()}))
+							.append($('<dt>', {text: 'Location'}))
+							.append($('<dd>', {text: person.city.name}))
+						),
+					$('<td />', {valign: 'top'})
+						.append($('<dl/>')
+							.append($('<dt>', {text: 'Phones'}))
+							.append($('<dd>', {html: $('<ul/>').append(drawPhonesList(person.phones))})
+							)
+						)
+				)
+			)
+			.appendTo(personSection);
 
-		const birthdate = $('<span/>', {text: 'Birth Date: ' + new Date(person.birthdate).toLocaleDateString()}).css({margin: '1em'});
-
-		const city = $('<span/>', {text: 'Location: ' + person.city.name}).css({margin: '1em'});
-
-		block.append(birthdate);
-		block.append('<br />');
-		block.append(city);
-		block.append('<br />');
-
-		root.append(block);
-
-		root.append('<hr/>');
+		const featuresList = ['family', 'training', 'superpower', 'ecotype'];
 
 		const petsList = person.pets.map((pet) => {
-			const row = $('<tr/>');
+			const row = $('<tr/>').css('padding', 30);
 
-			const name = $('<td/>', {text: pet.name}).css('padding', 3);
-			const type = $('<td/>', {text: pet.__typename}).css('padding', 3);
-			const sex = $('<td/>', {text: pet.sex ? 'male' : 'female'}).css('padding', 3);
-
-			const featuresList = ['family', 'training', 'superpower', 'ecotype'];
-
-			const features = featuresList.map((feature) =>
-				pet[feature] ?
-					$('<td/>', {text: pet[feature]}).css('padding', 3) :
-					undefined
-			).filter(i => i);
-
-			row.append(name);
-			row.append(type);
-			row.append(sex);
-			row.append(features);
+			const name = $('<td/>', {text: pet.name}).appendTo(row);
+			const type = $('<td/>', {text: pet.__typename}).appendTo(row);
+			const sex = $('<td/>', {text: pet.sex ? 'male' : 'female'}).appendTo(row);
+			const features = $('<td/>', {text: featuresList.map((feature) => pet[feature]).filter(i => i).join()}).appendTo(row);
 
 			return row;
 		});
 
-		const pets = $('<table/>', {});
-		petsList.forEach((pet) => pets.append(pet));
-
+		const pets = $('<table/>', {width: '50%'});
+		pets.append(petsList);
 		const petsS = $('<section/>');
-
 		const petsHeader = $('<h3/>', {text: 'Pets'});
-
 		petsS.append(petsHeader);
 		petsS.append(pets);
-
 		root.append(petsS);
-
-		root.append('<hr/>');
-
-
-		const friendsList = person.friends.map((person) => {
-			const row = $('<tr/>');
-
-			const name = $('<td/>', {text: person.name, valign: 'top'});
-
-			const birthdate = $('<td/>', {text: new Date(person.birthdate).toLocaleDateString(), valign: 'top'});
-
-			const phones = $('<ul/>').css('margin', 0);
-
-			const phonesList = person.phones.map((phone) => $('<li/>', {text: phone.value, valign: 'top'}).css('list-style-type', 'none'));
-
-			phonesList.forEach((phone) => phones.append(phone));
-
-			const phonesD = $('<td/>');
-
-			phonesD.append(phones);
-
-			row.append(name);
-			row.append(birthdate);
-			row.append(phonesD);
-
-			return row;
-		});
-
-		const residentsList = person.city.residents.map((person) => {
-			const row = $('<tr/>').css({'padding-left': '1em'});
-
-			const name = $('<td/>', {text: person.name, valign: 'top'});
-
-			const birthdate = $('<td/>', {text: new Date(person.birthdate).toLocaleDateString(), valign: 'top'});
-
-			const phones = $('<ul/>').css('margin', 0);
-
-			const phonesList = person.phones.map((phone) => $('<li/>', {text: phone.value}).css('list-style-type', 'none'));
-
-			phonesList.forEach((phone) => phones.append(phone));
-
-			const phonesD = $('<td/>');
-
-			phonesD.append(phones);
-
-			row.append(name);
-			row.append(birthdate);
-			row.append(phonesD);
-
-			return row;
-		});
 
 		const table = $('<table/>', {width: '100%'});
 		const row = $('<tr/>');
 		table.append(row);
 
 		const friends = $('<table/>', {width: '100%'});
-		friendsList.forEach((friend) => friends.append(friend));
+		const friendsList = person.friends.map(drawPersonRow);
+		friends.append(friendsList);
 		const friendsSection = $('<td/>', {valign: 'top', html: '<h3>Friends</h3>'});
 		friendsSection.append(friends);
 		row.append(friendsSection);
 
 		const residents = $('<table/>', {width: '100%'});
-		residentsList.forEach((resident) => residents.append(resident));
+		const residentsList = person.city.residents.map(drawPersonRow);
+		residents.append(residentsList);
 		const residentsSection = $('<td/>', {valign: 'top', html: '<h3>Neighbors</h3>'});
 		residentsSection.append(residents);
 		row.append(residentsSection);
-		root.append(table);
 
+		root.append(table);
 	}
 
 </script>
