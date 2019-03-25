@@ -20,7 +20,7 @@
 
 <main id="app"></main>
 
-<script>
+<script defer>
 
 	// ------------------------------------------------------------------------ //
 
@@ -81,9 +81,11 @@
 	}
 
 	// ------------------------------------------------------------------------ //
-
+	console.time('time');
 	getPersonProfile(1)
-		.then((response) => render(response));
+		.then((response) => {
+			console.timeEnd('time');
+			render(response)});
 
 	$('#drawPerson').on('submit', (event) => {
 		event.preventDefault();

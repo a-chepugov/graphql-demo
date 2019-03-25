@@ -20,7 +20,8 @@
 
 <main id="app"></main>
 
-<script>
+<script defer>
+
 	// ------------------------------------------------------------------------ //
 
 	const query = `
@@ -56,8 +57,11 @@ fragment baseData on Person { name birthdate phones }
 
 	// ------------------------------------------------------------------------ //
 
+	console.time('time');
 	getPersonProfile(1)
-		.then((response) => render(response));
+		.then((response) => {
+			console.timeEnd('time');
+			render(response)});
 
 	$('#drawPerson').on('submit', (event) => {
 		event.preventDefault();
@@ -121,7 +125,7 @@ fragment baseData on Person { name birthdate phones }
 
 			const name = $('<td/>', {text: pet.name}).appendTo(row);
 			const type = $('<td/>', {text: pet.__typename}).appendTo(row);
-			const sex = $('<td/>', {text: pet.sex ? 'male' : 'female'}).appendTo(row);
+			const sex = $('<td/>', {text: pet.sex}).appendTo(row);
 			const features = $('<td/>', {text: featuresList.map((feature) => pet[feature]).filter(i => i).join()}).appendTo(row);
 
 			return row;
