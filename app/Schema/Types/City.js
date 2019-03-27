@@ -14,10 +14,10 @@ module.exports.default = new GraphQLObjectType({
 		name: {type: GraphQLString},
 		code: {type: GraphQLString},
 		residents: {
+			type: new GraphQLList(require('./Person').default),
 			args: {
 				limit: {type: GraphQLInt, defaultValue: 5}
 			},
-			type: new GraphQLList(require('./Person').default),
 			resolve(parent, args, context, info) {
 				return context.managers.persons.getInCity(parent.id, args.limit);
 			}
