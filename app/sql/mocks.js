@@ -5,11 +5,11 @@ const cities = () => {
 
 	const cities = require('./locations.cities')(dbPromise);
 
-	cities.drop()
-		.then(() => cities.init())
-		.then(() => mocks.cities.map((item) => cities.create(item)))
-		.then((response) => Promise.all(response))
-		.catch(console.error);
+	// cities.drop()
+	// 	.then(() => cities.init())
+	// 	.then(() => mocks.cities.map((item) => cities.create(item)))
+	// 	.then((response) => Promise.all(response))
+	// 	.catch(console.error);
 
 	return cities;
 };
@@ -20,22 +20,22 @@ const persons = () => {
 	const persons = require('./persons.persons')(dbPromise);
 	const phones = require('./persons.phones')(dbPromise);
 
-	persons.drop()
-		.then(() => persons.init())
-		.then(() => phones.drop())
-		.then(() => phones.init())
-		.then(() => mocks.persons.map(
-			(item) => {
-				Promise.all([
-					persons.create(item),
-					item.phones.map((phone) => {
-						phones.create({owner_id: item.id, value: phone})
-					})
-				])
-			})
-		)
-		.then((response) => Promise.all(response))
-		.catch(console.error);
+	// persons.drop()
+	// 	.then(() => persons.init())
+	// 	.then(() => phones.drop())
+	// 	.then(() => phones.init())
+	// 	.then(() => mocks.persons.map(
+	// 		(item) => {
+	// 			Promise.all([
+	// 				persons.create(item),
+	// 				item.phones.map((phone) => {
+	// 					phones.create({owner_id: item.id, value: phone})
+	// 				})
+	// 			])
+	// 		})
+	// 	)
+	// 	.then((response) => Promise.all(response))
+	// 	.catch(console.error);
 
 	relations();
 
@@ -47,11 +47,11 @@ function relations() {
 
 	const relations = require('./persons.relations')(dbPromise);
 
-	relations.drop()
-		.then(() => relations.init())
-		.then(() => mocks.relations.map((item) => relations.create(item.id_one, item.id_two)))
-		.then((response) => Promise.all(response))
-		.catch(console.error);
+	// relations.drop()
+	// 	.then(() => relations.init())
+	// 	.then(() => mocks.relations.map((item) => relations.create(item.id_one, item.id_two)))
+	// 	.then((response) => Promise.all(response))
+	// 	.catch(console.error);
 
 	return relations;
 }
@@ -68,23 +68,23 @@ const pets = () => {
 
 	const ownership = require('./pets.ownership')(dbPromise);
 
-	Promise.resolve()
-		.then(() => Object.values(pets)
-			.map((item) =>
-				item.drop()
-					.then(() => item.init())
-			))
-		.then((response) => Promise.all(response))
-		.then(() => ownership.drop().then((response) => ownership.init()))
-		.then(() => {
-			return mocks.pets
-				.map((item) => {
-					return pets[item.__typename].create(item)
-						.then((response) => ownership.create({id: response.stmt.lastID, owner_id: item.owner_id, __typename: item.__typename}))
-				})
-		})
-		.then((response) => Promise.all(response))
-		.catch(console.error);
+	// Promise.resolve()
+	// 	.then(() => Object.values(pets)
+	// 		.map((item) =>
+	// 			item.drop()
+	// 				.then(() => item.init())
+	// 		))
+	// 	.then((response) => Promise.all(response))
+	// 	.then(() => ownership.drop().then((response) => ownership.init()))
+	// 	.then(() => {
+	// 		return mocks.pets
+	// 			.map((item) => {
+	// 				return pets[item.__typename].create(item)
+	// 					.then((response) => ownership.create({id: response.stmt.lastID, owner_id: item.owner_id, __typename: item.__typename}))
+	// 			})
+	// 	})
+	// 	.then((response) => Promise.all(response))
+	// 	.catch(console.error);
 
 	return pets;
 };
